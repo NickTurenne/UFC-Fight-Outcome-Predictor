@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 def initialize_fighter(fighter):
     stats_dict = {
@@ -15,6 +16,7 @@ def initialize_fighter(fighter):
         "losses" : 0,
         "win_streak" : 0,
         "loss_streak" : 0,
+        "date_of_last_fight" : None,
 
         # Offencsive stats
         "knockdowns" : 0,
@@ -63,3 +65,6 @@ def initialize_fighter(fighter):
         "ground_attempt_against" : 0,
     }
     return stats_dict
+
+def update_fighter_states(red_state, blue_state, fight):
+    return
