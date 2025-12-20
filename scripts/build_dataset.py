@@ -1,40 +1,14 @@
-import sys
 import pandas as pd
 import numpy as np
+from src.clean import clean_fight_event_data, clean_fighter_data
 from src.fighter_states import initialize_fighter, update_fighter_states
 from src.feature_engineering import build_features
-from pathlib import Path
 
 def main():
     fighter_states = {}
 
-    # Load data
-    project_root = Path().resolve().parents[0]
-    sys.path.append(str(project_root))
-
-    df_fighter = pd.read_csv(Path(project_root) / "UFC-Fight-Outcome-Predictor" / "data" / "raw" / "fighter_details.csv")
-    df_fight = pd.read_csv(Path(project_root) / "UFC-Fight-Outcome-Predictor"  / "data" / "raw" / "fight_details.csv")
-    df_event = pd.read_csv(Path(project_root) / "UFC-Fight-Outcome-Predictor" / "data" / "raw" / "event_details.csv")
-
-    # Basic data inspection
-    df_fighter.info()
-    df_fight.info()
-    df_event.info()
-
-    # Format DateTime
-    df_event["date"] = pd.to_datetime(df_event["date"], format="%B %d, %Y")
-    df_fighter["dob"] = pd.to_datetime(df_fighter["dob"], format="%b %d, %Y")
-    # Drop fights with no winner 
-    df_event = df_event.dropna(subset=["winner", "winner_id"])
-    # Drop fights before Unified Rules of MMA (UFC 28, November 17, 2000)
-    cutoff_date = pd.Timestamp("2000-11-17")
-    df_event = df_event[df_event["date"] >= cutoff_date]
-    # Sort the fights from oldest to newest for dataset construction
-    df_event = df_event.sort_values(by="date")
-
-    # Join events with fights
-    df_event_fights = pd.merge(df_event, df_fight, on="fight_id")
-    print(len(df_event_fights))
+    df_event_fights = clean_fight_event_data()
+    df_fighter = clean_fighter_data()
     
     # Construct the default blank fighter states for every fighter
     # Fighter states are used for incremental fight stat increases to avoid data leakage
@@ -61,8 +35,8 @@ def main():
         update_fighter_states(fighter_states[red_id], fighter_states[blue_id], fight)
 
     # Make dataset and save
-    # dataset = pd.DataFrame(dataset_list)
-    print(dataset_list[0])
+    dataset = pd.DataFrame(dataset_list)
+    print(dataset)
 
     # Encode and then save again for model training
 

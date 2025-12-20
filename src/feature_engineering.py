@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 
+AVERAGE_UFC_FIGHTER_AGE = 30
+
 def build_features(red_state, blue_state, fight):
     fight_data_dict = {
         "date" : fight.date,
@@ -30,7 +32,7 @@ def calc_accuracy(landed, total):
 
 def get_age(fight_date, dob):
     if pd.isna(dob):
-        return 30 * 365.25 # average UFC fighter age in days for fighters with no age (This is usually only the case for old fighters)
+        return AVERAGE_UFC_FIGHTER_AGE * 365.25 # average UFC fighter age in days for fighters with no age (This is usually only the case for old fighters)
     else:
         return (fight_date - dob).days
 
