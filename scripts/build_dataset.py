@@ -31,6 +31,15 @@ def main():
 
         dataset_list.append(features)
 
+        # Build the mirrored features and add label to add more data and remove corner bias
+        features = build_features(fighter_states[blue_id], fighter_states[red_id], fight)
+        if fight.winner_id == blue_id:
+            features["winner"] = 1
+        else:
+            features["winner"] = 0
+
+        dataset_list.append(features)
+
         # Update the fighter states based on the fight
         update_fighter_states(fighter_states[red_id], fighter_states[blue_id], fight)
 

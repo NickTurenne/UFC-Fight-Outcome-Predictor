@@ -120,7 +120,103 @@ def update_red_state(state, fight):
     state["total_str_attempt"] += fight.r_total_str_atmpted
     state["td_landed"] += fight.r_td_landed
     state["td_attempt"] += fight.r_td_atmpted
+    state["sub_attempt"] += fight.r_sub_att
+    state["ctrl_time"] += fight.r_ctrl
+    state["head_landed"] += fight.r_head_landed
+    state["head_attempt"] += fight.r_head_atmpted
+    state["body_landed"] += fight.r_body_landed
+    state["body_attempt"] += fight.r_body_atmpted
+    state["leg_landed"] += fight.r_leg_landed
+    state["leg_attempt"] += fight.r_leg_atmpted
+    state["distance_landed"] += fight.r_dist_landed
+    state["distance_attempt"] += fight.r_dist_atmpted
+    state["clinch_landed"] += fight.r_clinch_landed
+    state["clinch_attempt"] += fight.r_clinch_atmpted
+    state["ground_landed"] += fight.r_ground_landed
+    state["ground_attempt"] += fight.r_ground_atmpted
+
+    # Defensive stats
+    state["knockdowns_against"] += fight.b_kd
+    state["sig_str_landed_against"] += fight.b_sig_str_landed
+    state["sig_str_attempt_against"] += fight.b_sig_str_atmpted
+    state["total_str_landed_against"] += fight.b_total_str_landed
+    state["total_str_attempt_against"] += fight.b_total_str_atmpted
+    state["td_landed_against"] += fight.b_td_landed
+    state["td_attempt_against"] += fight.b_td_atmpted
+    state["sub_attempt_against"] += fight.b_sub_att
+    state["ctrl_time_against"] += fight.b_ctrl
+    state["head_landed_against"] += fight.b_head_landed
+    state["head_attempt_against"] += fight.b_head_atmpted
+    state["body_landed_against"] += fight.b_body_landed
+    state["body_attempt_against"] += fight.b_body_atmpted
+    state["leg_landed_against"] += fight.b_leg_landed
+    state["leg_attempt_against"] += fight.b_leg_atmpted
+    state["distance_landed_against"] += fight.b_dist_landed
+    state["distance_attempt_against"] += fight.b_dist_atmpted
+    state["clinch_landed_against"] += fight.b_clinch_landed
+    state["clinch_attempt_against"] += fight.b_clinch_atmpted
+    state["ground_landed_against"] += fight.b_ground_landed
+    state["ground_attempt_against"] += fight.b_ground_atmpted
     return
 
 def update_blue_state(state, fight):
+    # Update fight history
+    state["num_fights"] += 1
+    if fight.winner_id == fight.b_id:
+        state["wins"] += 1
+        state["win_streak"] += 1
+        if state["loss_streak"] > 0:
+            state["loss_streak"] = 0
+    else:
+        state["losses"] += 1
+        state["loss_streak"] += 1
+        if state["win_streak"] > 0:
+            state["win_streak"] = 0
+    state["date_of_last_fight"] = fight.date
+
+    # Offensive stats
+    state["knockdowns"] += fight.b_kd
+    state["sig_str_landed"] += fight.b_sig_str_landed
+    state["sig_str_attempt"] += fight.b_sig_str_atmpted
+    state["total_str_landed"] += fight.b_total_str_landed
+    state["total_str_attempt"] += fight.b_total_str_atmpted
+    state["td_landed"] += fight.b_td_landed
+    state["td_attempt"] += fight.b_td_atmpted
+    state["sub_attempt"] += fight.b_sub_att
+    state["ctrl_time"] += fight.b_ctrl
+    state["head_landed"] += fight.b_head_landed
+    state["head_attempt"] += fight.b_head_atmpted
+    state["body_landed"] += fight.b_body_landed
+    state["body_attempt"] += fight.b_body_atmpted
+    state["leg_landed"] += fight.b_leg_landed
+    state["leg_attempt"] += fight.b_leg_atmpted
+    state["distance_landed"] += fight.b_dist_landed
+    state["distance_attempt"] += fight.b_dist_atmpted
+    state["clinch_landed"] += fight.b_clinch_landed
+    state["clinch_attempt"] += fight.b_clinch_atmpted
+    state["ground_landed"] += fight.b_ground_landed
+    state["ground_attempt"] += fight.b_ground_atmpted
+
+    # Defensive stats
+    state["knockdowns_against"] += fight.r_kd
+    state["sig_str_landed_against"] += fight.r_sig_str_landed
+    state["sig_str_attempt_against"] += fight.r_sig_str_atmpted
+    state["total_str_landed_against"] += fight.r_total_str_landed
+    state["total_str_attempt_against"] += fight.r_total_str_atmpted
+    state["td_landed_against"] += fight.r_td_landed
+    state["td_attempt_against"] += fight.r_td_atmpted
+    state["sub_attempt_against"] += fight.r_sub_att
+    state["ctrl_time_against"] += fight.r_ctrl
+    state["head_landed_against"] += fight.r_head_landed
+    state["head_attempt_against"] += fight.r_head_atmpted
+    state["body_landed_against"] += fight.r_body_landed
+    state["body_attempt_against"] += fight.r_body_atmpted
+    state["leg_landed_against"] += fight.r_leg_landed
+    state["leg_attempt_against"] += fight.r_leg_atmpted
+    state["distance_landed_against"] += fight.r_dist_landed
+    state["distance_attempt_against"] += fight.r_dist_atmpted
+    state["clinch_landed_against"] += fight.r_clinch_landed
+    state["clinch_attempt_against"] += fight.r_clinch_atmpted
+    state["ground_landed_against"] += fight.r_ground_landed
+    state["ground_attempt_against"] += fight.r_ground_atmpted
     return
