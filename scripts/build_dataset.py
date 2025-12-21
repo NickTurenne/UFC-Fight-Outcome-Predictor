@@ -1,5 +1,7 @@
+import sys
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from src.clean import clean_fight_event_data, clean_fighter_data
 from src.fighter_states import initialize_fighter, update_fighter_states
 from src.feature_engineering import build_features
@@ -45,9 +47,10 @@ def main():
 
     # Make dataset and save
     dataset = pd.DataFrame(dataset_list)
-    print(dataset)
-
-    # Encode and then save again for model training
+    project_root = Path().resolve().parents[0]
+    sys.path.append(str(project_root))
+    dataset.to_csv(Path(project_root) / "UFC-Fight-Outcome-Predictor"  / "data" / "processed" / "dataset.csv", index=False)
+    print("Dataset saved!")
 
 
 
