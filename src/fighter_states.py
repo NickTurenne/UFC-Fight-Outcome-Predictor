@@ -220,3 +220,31 @@ def update_blue_state(state, fight):
     state["ground_landed_against"] += fight.r_ground_landed
     state["ground_attempt_against"] += fight.r_ground_atmpted
     return
+
+def get_red_stats_for_rolling_avg(fight):
+    return {
+        "sig_str_landed" : fight.r_sig_str_landed,
+        "sig_str_attempt" : fight.r_sig_str_atmpted,
+        "td_landed" : fight.r_td_landed,
+        "td_attempt" : fight.r_td_atmpted,
+        "sub_attempt" : fight.r_sub_att,
+        "ctrl_time" : fight.r_ctrl,
+        "sig_str_landed_against" : fight.b_sig_str_landed,
+        "sig_str_attemp_against" : fight.b_sig_str_atmpted,
+        "td_landed_against" : fight.b_td_landed,
+        "td_attempt_against" : fight.b_td_atmpted,
+    }
+
+def get_blue_stats_for_rolling_avg(fight):
+    return {
+        "sig_str_landed" : fight.b_sig_str_landed,
+        "sig_str_attempt" : fight.b_sig_str_atmpted,
+        "td_landed" : fight.b_td_landed,
+        "td_attempt" : fight.b_td_atmpted,
+        "sub_attempt" : fight.b_sub_att,
+        "ctrl_time" : fight.b_ctrl,
+        "sig_str_landed_against" : fight.r_sig_str_landed,
+        "sig_str_attempt_against" : fight.r_sig_str_atmpted,
+        "td_landed_against" : fight.r_td_landed,
+        "td_attempt_against" : fight.r_td_atmpted,
+    }

@@ -56,10 +56,32 @@ DIFF_FEATURES = [
     "clinch_def",
     "ground_def",
     "knockdown_against_avg",
+
+    # Advantages
+    "sig_str_adv",
+    "head_adv",
+    "distance_adv",
+    "td_adv",
+
+    # Rolling average
+    "sig_str_attempt_last_3_avg"
 ]
 
+ROLLING_STATS = [
+    "sig_str_landed_avg",
+    "sig_str_attempt_avg",
+    "sig_str_acc",
+    "td_landed_avg",
+    "td_attempt_avg",
+    "td_acc",
+    "sub_attempt_avg",
+    "ctrl_time_avg",
+    "sig_str_def",
+    "td_def",
+    "head_def"
+]
 
-def build_features(red_state, blue_state, fight):
+def build_features(red_state, blue_state, fight, fighter_last_3, red_id, blue_id):
     fight_data_dict = {
         "date" : fight.date,
         "division" : normalize_division(fight.division),
@@ -214,6 +236,8 @@ def build_features(red_state, blue_state, fight):
         "b_ground_attempt_against_avg" : safe_division(blue_state["ground_attempt_against"], blue_state["num_fights"]),
         "b_ground_def" : safe_defence(blue_state["ground_landed_against"], blue_state["ground_attempt_against"]),
     }
+    add_adv_features(fight_data_dict)
+    add_rolling_averages_to_row(fight_data_dict, fighter_last_3, red_id, blue_id)
     add_diff_features(fight_data_dict, DIFF_FEATURES)
     return fight_data_dict
 
@@ -246,6 +270,15 @@ def add_diff_features(row, diff_features):
         row[f"{feat}_diff"] = row[f"r_{feat}"] - row[f"b_{feat}"]
     return row
 
+def add_adv_features(row):
+    r_b = ["r", "b"]
+    for letter in r_b:
+        row[f"{letter}_sig_str_adv"] = row[f"{letter}_sig_str_acc"] - row[f"{letter}_sig_str_def"]
+        row[f"{letter}_head_adv"] = row[f"{letter}_head_acc"] - row[f"{letter}_head_def"]
+        row[f"{letter}_distance_adv"] = row[f"{letter}_distance_acc"] - row[f"{letter}_distance_def"]
+        row[f"{letter}_td_adv"] = row[f"{letter}_td_acc"] - row[f"{letter}_td_def"]
+    return row
+
 def normalize_division(division):
     division = division.lower().strip()
     
@@ -271,3 +304,81 @@ def normalize_division(division):
         return "super_heavyweight"
     else:
         return "other"
+
+def add_rolling_averages_to_row(row, fighter_last_3, red_id, blue_id):
+    for fighter_id, prefix in [(red_id, "r"), (blue_id, "b")]:
+        history = fighter_last_3[fighter_id] 
+
+        if len(history) == 0:
+            row[f"{prefix}_sig_str_landed_last_3_avg"] = 0.0
+            row[f"{prefix}_sig_str_attempt_last_3_avg"] = 0.0
+            row[f"{prefix}_sig_str_acc_last_3_avg"] = 0.0
+            row[f"{prefix}_sig_str_def_last_3_avg"] = 0.0
+
+            row[f"{prefix}_td_landed_last_3_avg"] = 0.0
+            row[f"{prefix}_td_attempt_last_3_avg"] = 0.0
+            row[f"{prefix}_td_acc_last_3_avg"] = 0.0
+            row[f"{prefix}_td_def_last_3_avg"] = 0.0
+
+            row[f"{prefix}_sub_attempt_last_3_avg"] = 0.0
+            row[f"{prefix}_ctrl_time_last_3_avg"] = 0.0
+            continue
+
+        sig_landed = []
+        sig_attempt = []
+        td_landed = []
+        td_attempt = []
+        sub_attempt = []
+        ctrl_time = []
+        sig_landed_against = []
+        sig_attempt_against = []
+        td_landed_against = []
+        td_attempt_against = []
+
+        for fight in history:
+            # Offensive
+            sig_landed.append(fight.get("sig_str_landed", 0))
+            sig_attempt.append(fight.get("sig_str_attempt", 0))
+            td_landed.append(fight.get("td_landed", 0))
+            td_attempt.append(fight.get("td_attempt", 0))
+            sub_attempt.append(fight.get("sub_attempt", 0))
+            ctrl_time.append(fight.get("ctrl_time", 0))
+
+            # Defensive
+            sig_landed_against.append(fight.get("sig_str_landed_against", 0))
+            sig_attempt_against.append(fight.get("sig_str_attempt_against", 0))
+            td_landed_against.append(fight.get("td_landed_against", 0))
+            td_attempt_against.append(fight.get("td_attempt_against", 0))
+
+        sig_landed = np.array(sig_landed, np.float32)
+        sig_attempt = np.array(sig_attempt, np.float32)
+        td_landed = np.array(td_landed, np.float32)
+        td_attempt = np.array(td_attempt, np.float32)
+        sub_attempt = np.array(sub_attempt, np.float32)
+        ctrl_time = np.array(ctrl_time, np.float32)
+        sig_landed_against = np.array(sig_landed_against, np.float32)
+        sig_attempt_against = np.array(sig_attempt_against, np.float32)
+        td_landed_against = np.array(td_landed_against, np.float32)
+        td_attempt_against = np.array(td_attempt_against, np.float32)
+
+        sig_acc = np.divide(sig_landed, sig_attempt, out=np.zeros_like(sig_attempt), where=sig_attempt>0)
+        sig_def = np.divide(sig_landed_against, sig_attempt_against, out=np.zeros_like(sig_attempt_against), where=sig_attempt_against>0)
+        td_acc = np.divide(td_landed, td_attempt, out=np.zeros_like(td_attempt), where=td_attempt>0)
+        td_def = np.divide(td_landed_against, td_attempt_against, out=np.zeros_like(td_attempt_against), where=td_attempt_against>0)
+
+        row[f"{prefix}_sig_str_landed_last_3_avg"] = float(sig_landed.mean())
+        row[f"{prefix}_sig_str_attempt_last_3_avg"] = float(sig_attempt.mean())
+        row[f"{prefix}_sig_str_acc_last_3_avg"] = float(sig_acc.mean())
+        row[f"{prefix}_sig_str_def_last_3_avg"] = float(sig_def.mean())
+
+        row[f"{prefix}_td_landed_last_3_avg"] = float(td_landed.mean())
+        row[f"{prefix}_td_attempt_last_3_avg"] = float(td_attempt.mean())
+        row[f"{prefix}_td_acc_last_3_avg"] = float(td_acc.mean())
+        row[f"{prefix}_td_def_last_3_avg"] = float(td_def.mean())
+
+        row[f"{prefix}_sub_attempt_last_3_avg"] = float(sub_attempt.mean())
+        row[f"{prefix}_ctrl_time_last_3_avg"] = float(ctrl_time.mean())
+
+    return row
+
+
