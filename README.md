@@ -7,7 +7,9 @@ The project demonstrates data preprocessing, feature engineering, model training
 ***
 ## Dataset
 The dataset includes all UFC fights from 1994 - September 2025. The model itself was only trained on fights post November 17, 2000 as this is when the unified rules for MMA were adopted by the UFC.
+
 Note: The dataset was mirrored to remove corner bias, so each fight appears twice (once with each fighter as "red").
+
 Source for data: https://www.kaggle.com/datasets/neelagiriaditya/ufc-datasets-1994-2025
 
 ***
