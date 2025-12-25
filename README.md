@@ -23,7 +23,9 @@ Key feature engineering steps:
 ## Model
 Algorithm: LightGBM classifier
 Hyperparameter tuning: Randomized search across multiple hyperparameters including num_leaves, learning_rate, subsample, colsample_bytree, and reg_lambda.
+
 Evaluation metric: AUC (Area Under the Receiver Operating Characteristic Curve)
+
 Final score: Test AUC = 0.654, a modest improvement from the baseline
 
 ***
